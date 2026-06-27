@@ -7,16 +7,17 @@
     <link rel="apple-touch-icon" href="logo.png">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131c2e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
+            /* Kräftiges, warmes Sand-Beige & edles Creme */
+            --bg-color: #e6dfd3; /* Richtiges, sattes Beige */
+            --card-bg: #f5f0e6;  /* Etwas helleres Soft-Creme */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd1c5;
             
-            /* Coole Tech-Farben */
-            --accent-parent: #38bdf8; /* Cooles Hellblau */
-            --accent-child: #34d399;  /* Neon-Grün */
-            --danger: #f87171;
+            /* Schlichte Kontraste ohne bunte Knöpfe */
+            --btn-dark: #27272a;
+            --btn-light: #e4e4e7;
+            --danger: #9f1239;
         }
 
         * {
@@ -35,95 +36,119 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 12px 12px calc(20px + env(safe-area-inset-bottom)) 12px;
+            align-items: stretch;
+            padding: 16px;
             padding-top: calc(16px + env(safe-area-inset-top));
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
         }
 
         .wrapper {
             width: 100%;
-            max-width: 100%; /* Nutzt die volle Handybreite */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Maximierte Card für Handys */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 24px 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
         }
 
         h1 {
-            font-size: 2rem; /* Riesiger Titel */
+            font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             text-align: center;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
 
         h2 {
-            font-size: 1.4rem; /* Große Zwischenüberschriften */
+            font-size: 1.4rem;
             font-weight: 700;
-            margin-top: 32px;
+            margin-top: 28px;
             margin-bottom: 16px;
-            letter-spacing: 0.3px;
         }
 
         .login-box {
             display: flex;
             flex-direction: column;
             gap: 16px;
+            flex: 1;
         }
 
-        /* XXL-Buttons für perfekte Bedienung */
-        .btn {
+        /* Schlichte XXL-Buttons, die den ganzen Screen ausnutzen */
+        .btn-login {
+            flex: 1;
             width: 100%;
-            padding: 18px; /* Extra hoch */
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            font-size: 1.15rem; /* Große Schrift */
+            border-radius: 18px;
+            font-size: 1.4rem;
             font-weight: 700;
-            background: #1e293b;
-            color: var(--text-main);
             cursor: pointer;
-            transition: transform 0.1s ease;
+            border: 1px solid var(--border-color);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: 10px;
+            transition: transform 0.1s ease;
         }
 
-        .btn:active {
-            transform: scale(0.96);
+        .btn-login:active {
+            transform: scale(0.98);
         }
 
-        .btn-parent-glow {
-            background: linear-gradient(135deg, #0284c7, #0369a1);
+        /* Mattschwaches Grau/Weiß fürs Kind */
+        .btn-login-child {
+            background: var(--btn-light);
+            color: var(--text-main);
+        }
+
+        /* Schlichtes Anthrazit für die Eltern */
+        .btn-login-parent {
+            background: var(--btn-dark);
+            color: #ffffff;
             border: none;
         }
 
-        .btn-child-glow {
-            background: linear-gradient(135deg, #059669, #047857);
+        /* Schlichte Action-Buttons */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: var(--btn-dark);
             border: none;
+            border-radius: 12px;
+            cursor: pointer;
         }
 
         .btn-text {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1.1rem; /* Besser lesbar */
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
-            padding: 10px;
+            padding: 8px;
         }
 
-        /* Große Eingabefelder */
+        /* Eingabefelder */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -136,76 +161,73 @@
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         input {
-            padding: 16px; /* Extra fett */
-            background: #0b0f19;
+            padding: 16px;
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            font-size: 1.1rem; /* Verhindert iOS-Zoom und ist groß */
-            color: #fff;
+            font-size: 1.15rem;
+            color: var(--text-main);
             outline: none;
             -webkit-user-select: text;
             user-select: text;
         }
 
         input:focus {
-            border-color: var(--accent-parent);
+            border-color: var(--text-main);
         }
 
         .nav-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .role-indicator {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 8px;
-            background: #1e293b;
+            padding: 6px 14px;
+            border-radius: 10px;
+            background: var(--btn-light);
         }
 
-        /* XXL-Guthaben-Anzeige */
+        /* Cleane, matte Guthaben-Box */
         .balance-section {
-            background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
-            border: 1px solid rgba(52, 211, 153, 0.2);
-            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             text-align: center;
-            padding: 28px 0;
-            margin-bottom: 24px;
+            padding: 24px 0;
+            margin-bottom: 20px;
         }
 
         .balance-label {
             font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-child);
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .balance-value {
-            font-size: 3.2rem; /* Riesige Euro-Zahl */
-            font-weight: 900;
-            letter-spacing: -1px;
-            color: #fff;
-            text-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+            font-size: 3.4rem;
+            font-weight: 800;
+            color: var(--text-main);
         }
 
-        /* XXL-Statistik-Boxen */
+        /* Statistik-Bereich */
         .stats-section {
             display: flex;
             justify-content: space-between;
-            background: #111827;
+            background: var(--btn-light);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 24px;
         }
@@ -221,20 +243,15 @@
             font-weight: 700;
             font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .stat-value {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 800;
-            color: #fff;
+            color: var(--text-main);
         }
 
-        .stat-value span {
-            color: var(--accent-child);
-        }
-
-        /* Große Aufgaben-Karten */
+        /* Aufgaben-Karten */
         .task-list {
             display: flex;
             flex-direction: column;
@@ -242,7 +259,7 @@
         }
 
         .task-card {
-            background: #1e293b;
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 18px 16px;
@@ -253,37 +270,26 @@
         }
 
         .task-card.waiting {
-            background: rgba(217, 119, 6, 0.04);
-            border-color: rgba(217, 119, 6, 0.3);
+            background: #fffbeb;
+            border-color: #fde68a;
         }
 
         .task-title {
             font-weight: 700;
-            font-size: 1.1rem; /* Deutlich größer */
-            margin-bottom: 6px;
-            color: #fff;
+            font-size: 1.15rem;
+            margin-bottom: 4px;
+            color: var(--text-main);
             word-break: break-word;
         }
 
         .task-reward {
-            font-size: 0.95rem;
-            color: var(--accent-child);
-            font-weight: 800;
-            background: rgba(52, 211, 153, 0.12);
+            font-size: 1rem;
+            color: var(--text-main);
+            font-weight: 700;
+            background: var(--btn-light);
             padding: 4px 10px;
             border-radius: 8px;
             display: inline-block;
-        }
-
-        .task-action {
-            flex-shrink: 0;
-        }
-
-        .task-action .btn {
-            padding: 12px 20px;
-            font-size: 0.95rem;
-            width: auto;
-            border-radius: 10px;
         }
 
         .parent-btn-group {
@@ -292,28 +298,43 @@
         }
 
         .btn-check {
-            background: var(--accent-child);
-            color: #0b0f19;
+            background: var(--btn-dark);
+            color: white;
             border: none;
-            font-size: 1.1rem !important;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .btn-trash {
-            color: var(--danger);
-            border-color: rgba(248, 113, 113, 0.2);
-            background: rgba(248, 113, 113, 0.05);
-            font-size: 1.1rem !important;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 1.2rem;
         }
 
-        /* GROSSES POP-UP */
+        .btn-complete {
+            background: var(--btn-dark);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        /* MODAL POP-UP */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 7, 12, 0.85);
-            backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -330,36 +351,28 @@
         }
 
         .modal-card {
-            background: #131c2e;
-            border: 1px solid #1e293b;
-            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
             padding: 28px 20px;
             width: 100%;
             max-width: 360px;
             text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .modal-overlay.active .modal-card {
-            transform: scale(1);
         }
 
         .modal-icon {
-            font-size: 2.2rem;
-            color: var(--danger);
+            font-size: 2.5rem;
             margin-bottom: 12px;
         }
 
         .modal-card h3 {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 800;
             margin-bottom: 10px;
-            color: #fff;
         }
 
         .modal-card p {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--text-muted);
             margin-bottom: 24px;
             line-height: 1.5;
@@ -367,30 +380,28 @@
 
         .modal-buttons {
             display: flex;
-            flex-direction: column; /* Knöpfe übereinander für Handys */
+            flex-direction: column;
             gap: 12px;
         }
 
         .btn-modal-confirm {
-            background: linear-gradient(135deg, #ef4444, #b91c1c);
-            color: #fff;
+            background: var(--danger);
+            color: white;
             border: none;
             padding: 16px;
             font-weight: 700;
             border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
         .btn-modal-cancel {
-            background: #1e293b;
+            background: var(--btn-light);
             color: var(--text-main);
-            border: 1px solid var(--border-color);
+            border: none;
             padding: 16px;
             font-weight: 700;
             border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
         .hidden { display: none !important; }
@@ -400,11 +411,17 @@
 
     <div class="wrapper">
         
-        <div id="loginScreen" class="card">
+        <div id="loginScreen" class="card login-card">
             <h1>Familien-Board</h1>
             <div class="login-box">
-                <button class="btn btn-child-glow" onclick="login('child')">👦 Ich bin das Kind</button>
-                <button class="btn btn-parent-glow" onclick="login('parent')">👨‍👩‍👧‍👦 Ich bin ein Elternteil</button>
+                <button class="btn-login btn-login-child" onclick="login('child')">
+                    <span style="font-size: 3rem;">👦</span>
+                    <span>Ich bin das Kind</span>
+                </button>
+                <button class="btn-login btn-login-parent" onclick="login('parent')">
+                    <span style="font-size: 3rem;">👨‍👩‍👧‍👦</span>
+                    <span>Ich bin Elternteil</span>
+                </button>
             </div>
         </div>
 
@@ -418,15 +435,15 @@
                 <div class="balance-label">Aktuelles Guthaben</div>
                 <div class="balance-value"><span id="balanceAmount">0,00</span> €</div>
                 
-                <div id="parentResetContainer" class="hidden" style="margin-top: 16px;">
-                    <button class="btn-text" style="color: var(--danger); font-weight: 700;" onclick="openResetModal()">Guthaben auszahlen</button>
+                <div id="parentResetContainer" class="hidden" style="margin-top: 14px;">
+                    <button class="btn-text" style="color: var(--danger);" onclick="openResetModal()">Guthaben auszahlen</button>
                 </div>
             </div>
 
             <div class="stats-section">
                 <div class="stat-box">
                     <div class="stat-label">Heute erledigt</div>
-                    <div class="stat-value"><span id="todayDone">0</span> Tasks</div>
+                    <div class="stat-value" id="todayDone">0 Tasks</div>
                 </div>
                 <div class="stat-box" style="text-align: right;">
                     <div class="stat-label">Heute insgesamt</div>
@@ -444,7 +461,7 @@
                     <label for="taskReward">Belohnung (€)</label>
                     <input type="number" id="taskReward" placeholder="z.B. 0.50" step="0.05" min="0">
                 </div>
-                <button class="btn btn-parent-glow" onclick="addTask()">Aufgabe abschicken</button>
+                <button class="btn-action" onclick="addTask()">Aufgabe abschicken</button>
             </div>
 
             <h2>Offene Aufgaben</h2>
@@ -457,7 +474,7 @@
         <div class="modal-card">
             <div class="modal-icon">⚠️</div>
             <h3>Guthaben zurücksetzen?</h3>
-            <p>Bist du sicher, dass du das aktuelle Guthaben auf 0,00 € setzen möchtest? Das kann nicht rückgängig gemacht werden.</p>
+            <p>Möchtest du das aktuelle Guthaben wirklich auf 0,00 € setzen?</p>
             <div class="modal-buttons">
                 <button class="btn-modal-confirm" onclick="confirmResetBalance()">Ja, löschen</button>
                 <button class="btn-modal-cancel" onclick="closeResetModal()">Abbrechen</button>
@@ -491,7 +508,7 @@
             
             const roleDisplay = document.getElementById('roleDisplay');
             roleDisplay.textContent = role === 'parent' ? 'Elternteil' : 'Kind';
-            roleDisplay.style.color = role === 'parent' ? 'var(--accent-parent)' : 'var(--accent-child)';
+            roleDisplay.style.color = 'var(--text-main)';
 
             if (role === 'parent') {
                 document.getElementById('parentArea').classList.remove('hidden');
@@ -524,7 +541,7 @@
             const totalToday = todayTasks.length;
             const doneToday = todayTasks.filter(task => task.status === 'done').length;
 
-            document.getElementById('todayDone').textContent = doneToday;
+            document.getElementById('todayDone').textContent = `${doneToday} Tasks`;
             document.getElementById('todayTotal').textContent = `${totalToday} Tasks`;
         }
 
@@ -608,7 +625,7 @@
             const activeTasks = tasks.filter(task => task.status !== 'done');
 
             if (activeTasks.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:1.05rem; padding: 24px 0;">Alles erledigt! Keine Aufgaben offen.</p>';
+                list.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:1.1rem; padding: 24px 0;">Alles erledigt! Keine Aufgaben offen.</p>';
                 return;
             }
 
@@ -621,19 +638,19 @@
 
                 if (currentRole === 'child') {
                     if (task.status === 'open') {
-                        actionButton = `<button class="btn btn-child-glow" style="padding: 10px 16px;" onclick="completeTask(${task.id})">Erledigt</button>`;
+                        actionButton = `<button class="btn-complete" onclick="completeTask(${task.id})">Erledigt</button>`;
                     } else if (isWaiting) {
-                        actionButton = `<span style="font-size: 1rem; color: #fbbf24; font-weight: 700;">Wird geprüft...</span>`;
+                        actionButton = `<span style="font-size: 1.05rem; color: #b45309; font-weight: 700;">Wird geprüft...</span>`;
                     }
                 } else if (currentRole === 'parent') {
                     if (isWaiting) {
                         actionButton = `
                             <div class="parent-btn-group">
-                                <button class="btn btn-check" onclick="approveTask(${task.id})">✔</button>
-                                <button class="btn btn-trash" onclick="deleteTask(${task.id})">🗑</button>
+                                <button class="btn-check" onclick="approveTask(${task.id})">✔</button>
+                                <button class="btn-trash" onclick="deleteTask(${task.id})">🗑</button>
                             </div>`;
                     } else {
-                        actionButton = `<button class="btn btn-trash" onclick="deleteTask(${task.id})">🗑</button>`;
+                        actionButton = `<button class="btn-trash" onclick="deleteTask(${task.id})">🗑</button>`;
                     }
                 }
 
