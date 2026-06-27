@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Familien-Board v3</title>
     <style>
         :root {
@@ -22,7 +22,12 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Verhindert das unschöne blaue Aufleuchten beim Tippen auf iOS */
+            -webkit-tap-highlight-color: transparent;
+            /* Macht das Auswählen von Text auf Buttons unmöglich */
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -32,12 +37,17 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 40px 20px;
+            padding: 20px 16px;
+            /* iOS Safe Areas für neuere iPhones mit Notch */
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         .wrapper {
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
         }
 
         /* Modern gestaltete Card mit feinem Glow-Effekt */
@@ -45,15 +55,15 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 28px;
+            padding: 24px 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         h1 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.5px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             text-align: center;
             background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
             -webkit-background-clip: text;
@@ -61,10 +71,10 @@
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-top: 28px;
-            margin-bottom: 16px;
+            margin-top: 24px;
+            margin-bottom: 14px;
             letter-spacing: 0.3px;
         }
 
@@ -72,7 +82,7 @@
         .login-box {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
 
         /* Interaktive Tech-Buttons */
@@ -80,38 +90,31 @@
             width: 100%;
             padding: 14px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 0.95rem;
             font-weight: 600;
             background: #1e293b;
             color: var(--text-main);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn:hover {
-            background: #273549;
-            transform: translateY(-1px);
+        /* Aktiver Zustand für mobiles Feedback */
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
         }
 
         .btn-parent-glow {
             background: linear-gradient(135deg, #0284c7, #0369a1);
             border: none;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
-        }
-        .btn-parent-glow:hover {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
         }
 
         .btn-child-glow {
             background: linear-gradient(135deg, #059669, #047857);
             border: none;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
-        }
-        .btn-child-glow:hover {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
         }
 
         .btn-text {
@@ -120,9 +123,10 @@
             color: var(--text-muted);
             font-size: 0.85rem;
             cursor: pointer;
-            transition: color 0.2s;
+            padding: 6px;
         }
-        .btn-text:hover {
+        
+        .btn-text:active {
             color: #fff;
         }
 
@@ -130,12 +134,12 @@
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-bottom: 14px;
         }
 
         .input-group label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -143,14 +147,16 @@
         }
 
         input {
-            padding: 12px 14px;
+            padding: 12px;
             background: #0b0f19;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            font-size: 0.95rem;
+            font-size: 1rem; /* Verhindert iOS Zoom bei Fokus */
             color: #fff;
             outline: none;
             transition: border-color 0.2s;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         input:focus {
@@ -162,13 +168,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .role-indicator {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             padding: 4px 10px;
             border-radius: 6px;
@@ -178,29 +184,29 @@
         /* Coole, farbintensive Guthaben-Anzeige */
         .balance-section {
             background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
-            border: 1px solid rgba(52, 211, 153, 0.2);
+            border: 1px solid rgba(52, 211, 153, 0.15);
             border-radius: 14px;
             text-align: center;
-            padding: 24px 0;
-            margin-bottom: 24px;
-            box-shadow: 0 10px 20px rgba(4, 120, 87, 0.15);
+            padding: 20px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(4, 120, 87, 0.1);
         }
 
         .balance-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent-child);
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .balance-value {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             color: #fff;
-            text-shadow: 0 2px 10px rgba(52, 211, 153, 0.3);
+            text-shadow: 0 2px 10px rgba(52, 211, 153, 0.25);
         }
 
         /* Tägliche Statistiken */
@@ -210,9 +216,9 @@
             background: #111827;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            font-size: 0.85rem;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
         }
 
         .stat-box {
@@ -224,7 +230,7 @@
         .stat-label {
             color: var(--text-muted);
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -242,51 +248,57 @@
         .task-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .task-card {
             background: #1e293b;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.2s;
         }
 
         .task-card.waiting {
-            background: rgba(217, 119, 6, 0.05);
-            border-color: rgba(217, 119, 6, 0.3);
+            background: rgba(217, 119, 6, 0.03);
+            border-color: rgba(217, 119, 6, 0.25);
         }
 
         .task-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             margin-bottom: 4px;
             color: #fff;
+            word-break: break-word;
+            padding-right: 8px;
         }
 
         .task-reward {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--accent-child);
             font-weight: 700;
-            background: rgba(52, 211, 153, 0.1);
-            padding: 2px 8px;
+            background: rgba(52, 211, 153, 0.08);
+            padding: 2px 6px;
             border-radius: 6px;
             display: inline-block;
         }
 
+        .task-action {
+            flex-shrink: 0;
+        }
+
         .task-action .btn {
-            padding: 8px 16px;
-            font-size: 0.85rem;
+            padding: 8px 14px;
+            font-size: 0.8rem;
             width: auto;
+            border-radius: 8px;
         }
 
         .parent-btn-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn-check {
@@ -294,36 +306,29 @@
             color: #0b0f19;
             border: none;
         }
-        .btn-check:hover {
-            background: #059669;
-        }
 
         .btn-trash {
             color: var(--danger);
-            border-color: rgba(248, 113, 113, 0.2);
-            background: rgba(248, 113, 113, 0.05);
-        }
-        .btn-trash:hover {
-            background: rgba(248, 113, 113, 0.15);
-            border-color: var(--danger);
+            border-color: rgba(248, 113, 113, 0.15);
+            background: rgba(248, 113, 113, 0.03);
         }
 
-        /* STYLISCHES CUSTOM POP-UP (MODAL) */
+        /* CUSTOM POP-UP */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 7, 12, 0.8);
-            backdrop-filter: blur(4px);
+            background: rgba(5, 7, 12, 0.85);
+            backdrop-filter: blur(6px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .modal-overlay.active {
@@ -334,14 +339,13 @@
         .modal-card {
             background: #131c2e;
             border: 1px solid #1e293b;
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 24px;
-            width: 90%;
-            max-width: 360px;
+            width: 85%;
+            max-width: 340px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             transform: scale(0.9);
-            transition: transform 0.2s ease;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .modal-overlay.active .modal-card {
@@ -349,28 +353,28 @@
         }
 
         .modal-icon {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--danger);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .modal-card h3 {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #fff;
         }
 
         .modal-card p {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             line-height: 1.4;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-modal-confirm {
@@ -382,10 +386,7 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            font-size: 0.9rem;
-        }
-        .btn-modal-confirm:hover {
-            background: linear-gradient(135deg, #f87171, #ef4444);
+            font-size: 0.85rem;
         }
 
         .btn-modal-cancel {
@@ -397,10 +398,7 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            font-size: 0.9rem;
-        }
-        .btn-modal-cancel:hover {
-            background: #273549;
+            font-size: 0.85rem;
         }
 
         .hidden { display: none !important; }
@@ -428,7 +426,7 @@
                 <div class="balance-label">Aktuelles Guthaben</div>
                 <div class="balance-value"><span id="balanceAmount">0,00</span> €</div>
                 
-                <div id="parentResetContainer" class="hidden" style="margin-top: 14px;">
+                <div id="parentResetContainer" class="hidden" style="margin-top: 12px;">
                     <button class="btn-text" style="color: var(--danger); font-weight: 600;" onclick="openResetModal()">Guthaben auszahlen</button>
                 </div>
             </div>
@@ -444,7 +442,7 @@
                 </div>
             </div>
 
-            <div id="parentArea" class="hidden" style="border-bottom: 1px solid var(--border-color); padding-bottom: 24px; margin-bottom: 12px;">
+            <div id="parentArea" class="hidden" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 12px;">
                 <h2>Neue Aufgabe erstellen</h2>
                 <div class="input-group">
                     <label for="taskTitle">Was steht an?</label>
@@ -561,6 +559,9 @@
 
             titleInput.value = '';
             rewardInput.value = '';
+            
+            // Schließt die Tastatur auf dem Handy nach dem Abschicken
+            document.activeElement.blur();
         }
 
         function completeTask(id) {
@@ -589,7 +590,6 @@
             saveAndRefresh();
         }
 
-        /* POP-UP STEUERUNG */
         function openResetModal() {
             document.getElementById('resetModal').classList.add('active');
         }
@@ -648,7 +648,7 @@
                 }
 
                 item.innerHTML = `
-                    <div>
+                    <div style="flex: 1; min-width: 0;">
                         <div class="task-title" style="${isWaiting ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${task.title}</div>
                         <div class="task-reward">+ ${task.reward.toFixed(2).replace('.', ',')} €</div>
                     </div>
