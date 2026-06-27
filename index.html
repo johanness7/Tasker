@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tasker</title>
     <link rel="apple-touch-icon" href="logo.png">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             /* Kräftiges, warmes Sand-Beige & edles Creme */
-            --bg-color: #e6dfd3; /* Richtiges, sattes Beige */
-            --card-bg: #f5f0e6;  /* Etwas helleres Soft-Creme */
+            --bg-color: #e6dfd3; 
+            --card-bg: #f5f0e6;  
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #cbd1c5;
@@ -91,7 +95,6 @@
             flex: 1;
         }
 
-        /* Schlichte XXL-Buttons, die den ganzen Screen ausnutzen */
         .btn-login {
             flex: 1;
             width: 100%;
@@ -112,20 +115,17 @@
             transform: scale(0.98);
         }
 
-        /* Mattschwaches Grau/Weiß fürs Kind */
         .btn-login-child {
             background: var(--btn-light);
             color: var(--text-main);
         }
 
-        /* Schlichtes Anthrazit für die Eltern */
         .btn-login-parent {
             background: var(--btn-dark);
             color: #ffffff;
             border: none;
         }
 
-        /* Schlichte Action-Buttons */
         .btn-action {
             width: 100%;
             padding: 16px;
@@ -148,7 +148,6 @@
             padding: 8px;
         }
 
-        /* Eingabefelder */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -196,7 +195,6 @@
             background: var(--btn-light);
         }
 
-        /* Cleane, matte Guthaben-Box */
         .balance-section {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -221,7 +219,6 @@
             color: var(--text-main);
         }
 
-        /* Statistik-Bereich */
         .stats-section {
             display: flex;
             justify-content: space-between;
@@ -251,7 +248,6 @@
             color: var(--text-main);
         }
 
-        /* Aufgaben-Karten */
         .task-list {
             display: flex;
             flex-direction: column;
@@ -326,7 +322,6 @@
             font-weight: 700;
         }
 
-        /* MODAL POP-UP */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -483,9 +478,24 @@
     </div>
 
     <script>
+        // Deine Firebase Konfiguration direkt integriert
+        const firebaseConfig = {
+          apiKey: "AIzaSyC5cyy8yAu8HSsNawVbvCd4i6QT3tDYdcY",
+          authDomain: "tasker-95d59.firebaseapp.com",
+          projectId: "tasker-95d59",
+          storageBucket: "tasker-95d59.firebasestorage.app",
+          messagingSenderId: "316824945444",
+          appId: "1:316824945444:web:4ed14424a317e9c60f29b1",
+          databaseURL: "https://tasker-95d59-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        // Firebase starten
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let currentRole = null;
-        let tasks = JSON.parse(localStorage.getItem('fam_tasks_v3')) || [];
-        let balance = parseFloat(localStorage.getItem('fam_balance_v3')) || 0.00;
+        let tasks = [];
+        let balance = 0.00;
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedRole = localStorage.getItem('fam_saved_role_v3');
@@ -518,9 +528,7 @@
                 document.getElementById('parentResetContainer').classList.add('hidden');
             }
 
-            renderTasks();
-            updateBalanceDisplay();
-            updateStatsDisplay();
+            startCloudSync();
         }
 
         function logout() {
@@ -530,9 +538,25 @@
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
+        function startCloudSync() {
+            db.ref('balance').on('value', (snapshot) => {
+                balance = snapshot.val() || 0.00;
+                updateBalanceDisplay();
+            });
+
+            db.ref('tasks').on('value', (snapshot) => {
+                const tasksObj = snapshot.val() || {};
+                tasks = Object.keys(tasksObj).map(key => ({
+                    id: key,
+                    ...tasksObj[key]
+                }));
+                renderTasks();
+                updateStatsDisplay();
+            });
+        }
+
         function updateBalanceDisplay() {
             document.getElementById('balanceAmount').textContent = balance.toFixed(2).replace('.', ',');
-            localStorage.setItem('fam_balance_v3', balance);
         }
 
         function updateStatsDisplay() {
@@ -555,15 +579,13 @@
             }
 
             const newTask = {
-                id: Date.now(),
                 title: titleInput.value,
                 reward: parseFloat(rewardInput.value),
                 status: 'open',
                 date: getTodayString()
             };
 
-            tasks.push(newTask);
-            saveAndRefresh();
+            db.ref('tasks').push(newTask);
 
             titleInput.value = '';
             rewardInput.value = '';
@@ -572,29 +594,22 @@
         }
 
         function completeTask(id) {
-            tasks = tasks.map(task => {
-                if (task.id === id) task.status = 'waiting';
-                return task;
-            });
-            saveAndRefresh();
+            db.ref(`tasks/${id}`).update({ status: 'waiting' });
         }
 
         function approveTask(id) {
-            tasks = tasks.map(task => {
-                if (task.id === id) {
-                    task.status = 'done';
-                    balance += task.reward;
-                }
-                return task;
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            db.ref(`tasks/${id}`).update({ status: 'done' });
+
+            db.ref('balance').transaction((currentBalance) => {
+                return (currentBalance || 0.00) + task.reward;
             });
-            
-            saveAndRefresh();
-            updateBalanceDisplay();
         }
 
         function deleteTask(id) {
-            tasks = tasks.filter(task => task.id !== id);
-            saveAndRefresh();
+            db.ref(`tasks/${id}`).remove();
         }
 
         function openResetModal() {
@@ -606,16 +621,10 @@
         }
 
         function confirmResetBalance() {
-            balance = 0.00;
-            updateBalanceDisplay();
-            updateStatsDisplay();
+            db.ref('balance').transaction(() => {
+                return 0.00;
+            });
             closeResetModal();
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('fam_tasks_v3', JSON.stringify(tasks));
-            renderTasks();
-            updateStatsDisplay();
         }
 
         function renderTasks() {
@@ -629,6 +638,11 @@
                 return;
             }
 
+            activeTasks.sort((a, b) => {
+                if (a.status === b.status) return b.id - a.id;
+                return a.status === 'waiting' ? -1 : 1;
+            });
+
             activeTasks.forEach(task => {
                 const item = document.createElement('div');
                 const isWaiting = task.status === 'waiting';
@@ -638,7 +652,7 @@
 
                 if (currentRole === 'child') {
                     if (task.status === 'open') {
-                        actionButton = `<button class="btn-complete" onclick="completeTask(${task.id})">Erledigt</button>`;
+                        actionButton = `<button class="btn-complete" onclick="completeTask('${task.id}')">Erledigt</button>`;
                     } else if (isWaiting) {
                         actionButton = `<span style="font-size: 1.05rem; color: #b45309; font-weight: 700;">Wird geprüft...</span>`;
                     }
@@ -646,11 +660,11 @@
                     if (isWaiting) {
                         actionButton = `
                             <div class="parent-btn-group">
-                                <button class="btn-check" onclick="approveTask(${task.id})">✔</button>
-                                <button class="btn-trash" onclick="deleteTask(${task.id})">🗑</button>
+                                <button class="btn-check" onclick="approveTask('${task.id}')">✔</button>
+                                <button class="btn-trash" onclick="deleteTask('${task.id}')">🗑</button>
                             </div>`;
                     } else {
-                        actionButton = `<button class="btn-trash" onclick="deleteTask(${task.id})">🗑</button>`;
+                        actionButton = `<button class="btn-trash" onclick="deleteTask('${task.id}')">🗑</button>`;
                     }
                 }
 
