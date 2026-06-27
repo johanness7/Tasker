@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familien-Board v3</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131c2e;
+            --text-main: #f8fafc;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
+            
+            /* Coole Tech-Farben */
+            --accent-parent: #38bdf8; /* Cooles Hellblau */
+            --accent-child: #34d399;  /* Neon-Grün */
+            --danger: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        /* Modern gestaltete Card mit feinem Glow-Effekt */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 28px;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Login-Bereich */
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Interaktive Tech-Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: #1e293b;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover {
+            background: #273549;
+            transform: translateY(-1px);
+        }
+
+        .btn-parent-glow {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border: none;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+        .btn-parent-glow:hover {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-child-glow {
+            background: linear-gradient(135deg, #059669, #047857);
+            border: none;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+        .btn-child-glow:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .btn-text:hover {
+            color: #fff;
+        }
+
+        /* Stylische Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            padding: 12px 14px;
+            background: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-parent);
+        }
+
+        /* Top Bar Navigation */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .role-indicator {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #1e293b;
+        }
+
+        /* Coole, farbintensive Guthaben-Anzeige */
+        .balance-section {
+            background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 14px;
+            text-align: center;
+            padding: 24px 0;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 20px rgba(4, 120, 87, 0.15);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-child);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .balance-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(52, 211, 153, 0.3);
+        }
+
+        /* Tägliche Statistiken */
+        .stats-section {
+            display: flex;
+            justify-content: space-between;
+            background: #111827;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-value span {
+            color: var(--accent-child);
+        }
+
+        /* Aufgaben-Karten */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .task-card.waiting {
+            background: rgba(217, 119, 6, 0.05);
+            border-color: rgba(217, 119, 6, 0.3);
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .task-reward {
+            font-size: 0.85rem;
+            color: var(--accent-child);
+            font-weight: 700;
+            background: rgba(52, 211, 153, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .task-action .btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        .parent-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-check {
+            background: var(--accent-child);
+            color: #0b0f19;
+            border: none;
+        }
+        .btn-check:hover {
+            background: #059669;
+        }
+
+        .btn-trash {
+            color: var(--danger);
+            border-color: rgba(248, 113, 113, 0.2);
+            background: rgba(248, 113, 113, 0.05);
+        }
+        .btn-trash:hover {
+            background: rgba(248, 113, 113, 0.15);
+            border-color: var(--danger);
+        }
+
+        /* STYLISCHES CUSTOM POP-UP (MODAL) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 7, 12, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #131c2e;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 24px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 2rem;
+            color: var(--danger);
+            margin-bottom: 12px;
+        }
+
+        .modal-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .modal-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-modal-confirm {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .btn-modal-confirm:hover {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+
+        .btn-modal-cancel {
+            background: #1e293b;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .btn-modal-cancel:hover {
+            background: #273549;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        
+        <div id="loginScreen" class="card">
+            <h1>Familien-Board</h1>
+            <div class="login-box">
+                <button class="btn btn-child-glow" onclick="login('child')">👦 Ich bin das Kind</button>
+                <button class="btn btn-parent-glow" onclick="login('parent')">👨‍👩‍👧‍👦 Ich bin ein Elternteil</button>
+            </div>
+        </div>
+
+        <div id="dashboard" class="card hidden">
+            <div class="nav-header">
+                <span id="roleDisplay" class="role-indicator"></span>
+                <button class="btn-text" onclick="logout()">Abmelden</button>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">Aktuelles Guthaben</div>
+                <div class="balance-value"><span id="balanceAmount">0,00</span> €</div>
+                
+                <div id="parentResetContainer" class="hidden" style="margin-top: 14px;">
+                    <button class="btn-text" style="color: var(--danger); font-weight: 600;" onclick="openResetModal()">Guthaben auszahlen</button>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-box">
+                    <div class="stat-label">Heute erledigt</div>
+                    <div class="stat-value"><span id="todayDone">0</span> Tasks</div>
+                </div>
+                <div class="stat-box" style="text-align: right;">
+                    <div class="stat-label">Heute insgesamt</div>
+                    <div class="stat-value" id="todayTotal">0 Tasks</div>
+                </div>
+            </div>
+
+            <div id="parentArea" class="hidden" style="border-bottom: 1px solid var(--border-color); padding-bottom: 24px; margin-bottom: 12px;">
+                <h2>Neue Aufgabe erstellen</h2>
+                <div class="input-group">
+                    <label for="taskTitle">Was steht an?</label>
+                    <input type="text" id="taskTitle" placeholder="z.B. Staubsaugen">
+                </div>
+                <div class="input-group">
+                    <label for="taskReward">Belohnung (€)</label>
+                    <input type="number" id="taskReward" placeholder="z.B. 0.50" step="0.05" min="0">
+                </div>
+                <button class="btn btn-parent-glow" onclick="addTask()">Aufgabe abschicken</button>
+            </div>
+
+            <h2>Offene Aufgaben</h2>
+            <div id="taskList" class="task-list"></div>
+        </div>
+
+    </div>
+
+    <div id="resetModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <h3>Guthaben zurücksetzen?</h3>
+            <p>Bist du sicher, dass du das aktuelle Guthaben auf 0,00 € setzen möchtest? Das kann nicht rückgängig gemacht werden.</p>
+            <div class="modal-buttons">
+                <button class="btn-modal-cancel" onclick="closeResetModal()">Abbrechen</button>
+                <button class="btn-modal-confirm" onclick="confirmResetBalance()">Ja, löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRole = null;
+        let tasks = JSON.parse(localStorage.getItem('fam_tasks_v3')) || [];
+        let balance = parseFloat(localStorage.getItem('fam_balance_v3')) || 0.00;
+
+        // AUTOMATISCHER LOGIN
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedRole = localStorage.getItem('fam_saved_role_v3');
+            if (savedRole) {
+                login(savedRole);
+            }
+        });
+
+        function getTodayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function login(role) {
+            currentRole = role;
+            localStorage.setItem('fam_saved_role_v3', role);
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            const roleDisplay = document.getElementById('roleDisplay');
+            roleDisplay.textContent = role === 'parent' ? 'Modus: Elternteil' : 'Modus: Kind';
+            roleDisplay.style.color = role === 'parent' ? 'var(--accent-parent)' : 'var(--accent-child)';
+
+            if (role === 'parent') {
+                document.getElementById('parentArea').classList.remove('hidden');
+                document.getElementById('parentResetContainer').classList.remove('hidden');
+            } else {
+                document.getElementById('parentArea').classList.add('hidden');
+                document.getElementById('parentResetContainer').classList.add('hidden');
+            }
+
+            renderTasks();
+            updateBalanceDisplay();
+            updateStatsDisplay();
+        }
+
+        function logout() {
+            currentRole = null;
+            localStorage.removeItem('fam_saved_role_v3');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function updateBalanceDisplay() {
+            document.getElementById('balanceAmount').textContent = balance.toFixed(2).replace('.', ',');
+            localStorage.setItem('fam_balance_v3', balance);
+        }
+
+        function updateStatsDisplay() {
+            const todayStr = getTodayString();
+            const todayTasks = tasks.filter(task => task.date === todayStr);
+            const totalToday = todayTasks.length;
+            const doneToday = todayTasks.filter(task => task.status === 'done').length;
+
+            document.getElementById('todayDone').textContent = doneToday;
+            document.getElementById('todayTotal').textContent = `${totalToday} Tasks`;
+        }
+
+        function addTask() {
+            const titleInput = document.getElementById('taskTitle');
+            const rewardInput = document.getElementById('taskReward');
+
+            if (!titleInput.value || !rewardInput.value) {
+                alert('Bitte trag eine Aufgabe und den Betrag ein.');
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                title: titleInput.value,
+                reward: parseFloat(rewardInput.value),
+                status: 'open',
+                date: getTodayString()
+            };
+
+            tasks.push(newTask);
+            saveAndRefresh();
+
+            titleInput.value = '';
+            rewardInput.value = '';
+        }
+
+        function completeTask(id) {
+            tasks = tasks.map(task => {
+                if (task.id === id) task.status = 'waiting';
+                return task;
+            });
+            saveAndRefresh();
+        }
+
+        function approveTask(id) {
+            tasks = tasks.map(task => {
+                if (task.id === id) {
+                    task.status = 'done';
+                    balance += task.reward;
+                }
+                return task;
+            });
+            
+            saveAndRefresh();
+            updateBalanceDisplay();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            saveAndRefresh();
+        }
+
+        /* POP-UP STEUERUNG */
+        function openResetModal() {
+            document.getElementById('resetModal').classList.add('active');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('active');
+        }
+
+        function confirmResetBalance() {
+            balance = 0.00;
+            updateBalanceDisplay();
+            updateStatsDisplay();
+            closeResetModal();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('fam_tasks_v3', JSON.stringify(tasks));
+            renderTasks();
+            updateStatsDisplay();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+
+            const activeTasks = tasks.filter(task => task.status !== 'done');
+
+            if (activeTasks.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 20px 0;">Alles erledigt! Keine Aufgaben offen.</p>';
+                return;
+            }
+
+            activeTasks.forEach(task => {
+                const item = document.createElement('div');
+                const isWaiting = task.status === 'waiting';
+                item.className = `task-card ${isWaiting ? 'waiting' : ''}`;
+
+                let actionButton = '';
+
+                if (currentRole === 'child') {
+                    if (task.status === 'open') {
+                        actionButton = `<button class="btn btn-child-glow" style="padding: 8px 14px;" onclick="completeTask(${task.id})">Erledigt</button>`;
+                    } else if (isWaiting) {
+                        actionButton = `<span style="font-size: 0.85rem; color: #fbbf24; font-weight: 600;">Wird geprüft...</span>`;
+                    }
+                } else if (currentRole === 'parent') {
+                    if (isWaiting) {
+                        actionButton = `
+                            <div class="parent-btn-group">
+                                <button class="btn btn-check" onclick="approveTask(${task.id})">✔</button>
+                                <button class="btn btn-trash" onclick="deleteTask(${task.id})">🗑</button>
+                            </div>`;
+                    } else {
+                        actionButton = `<button class="btn btn-trash" onclick="deleteTask(${task.id})">🗑</button>`;
+                    }
+                }
+
+                item.innerHTML = `
+                    <div>
+                        <div class="task-title" style="${isWaiting ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${task.title}</div>
+                        <div class="task-reward">+ ${task.reward.toFixed(2).replace('.', ',')} €</div>
+                    </div>
+                    <div class="task-action">
+                        ${actionButton}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
