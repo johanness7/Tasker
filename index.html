@@ -11,14 +11,11 @@
 
     <style>
         :root {
-            /* Kräftiges, warmes Sand-Beige & edles Creme */
             --bg-color: #e6dfd3; 
             --card-bg: #f5f0e6;  
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #cbd1c5;
-            
-            /* Schlichte Kontraste ohne bunte Knöpfe */
             --btn-dark: #27272a;
             --btn-light: #e4e4e7;
             --danger: #9f1239;
@@ -478,7 +475,6 @@
     </div>
 
     <script>
-        // Deine Firebase Konfiguration direkt integriert
         const firebaseConfig = {
           apiKey: "AIzaSyC5cyy8yAu8HSsNawVbvCd4i6QT3tDYdcY",
           authDomain: "tasker-95d59.firebaseapp.com",
@@ -489,13 +485,13 @@
           databaseURL: "https://tasker-95d59-default-rtdb.europe-west1.firebasedatabase.app/"
         };
 
-        // Firebase starten
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         let currentRole = null;
         let tasks = [];
         let balance = 0.00;
+        let isFirstLoad = true; // Verhindert, dass alte Aufgaben beim Starten benachrichtigen
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedRole = localStorage.getItem('fam_saved_role_v3');
@@ -509,9 +505,33 @@
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
+        // BENACHRICHTIGUNGS-ERLAUBNIS ANFORDERN
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        console.log("Benachrichtigungen erlaubt!");
+                    }
+                });
+            }
+        }
+
+        // ECHTE PUSH-FUNKTION (Sendet Meldung ans Handy)
+        function sendNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, {
+                    body: body,
+                    icon: 'logo.png'
+                });
+            }
+        }
+
         function login(role) {
             currentRole = role;
             localStorage.setItem('fam_saved_role_v3', role);
+
+            // Direkt nach Erlaubnis fragen, sobald eingeloggt
+            requestNotificationPermission();
 
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
@@ -544,12 +564,37 @@
                 updateBalanceDisplay();
             });
 
+            // CLOUD-LISTENER: Prüft live, ob neue Dinge passieren
             db.ref('tasks').on('value', (snapshot) => {
                 const tasksObj = snapshot.val() || {};
-                tasks = Object.keys(tasksObj).map(key => ({
+                const newTasksList = Object.keys(tasksObj).map(key => ({
                     id: key,
                     ...tasksObj[key]
                 }));
+
+                // BENACHRICHTIGUNGS-LOGIK
+                if (!isFirstLoad) {
+                    // 1. Für das Kind: Kam eine neue Aufgabe hinzu?
+                    if (currentRole === 'child' && newTasksList.length > tasks.length) {
+                        const addedTask = newTasksList.find(nt => !tasks.some(ot => ot.id === nt.id));
+                        if (addedTask && addedTask.status === 'open') {
+                            sendNotification("Neue Aufgabe! 📋", `${addedTask.title} für ${addedTask.reward.toFixed(2).replace('.', ',')} €`);
+                        }
+                    }
+
+                    // 2. Für die Eltern: Hat das Kind eine Aufgabe abgegeben?
+                    if (currentRole === 'parent') {
+                        newTasksList.forEach(nt => {
+                            const oldTask = tasks.find(ot => ot.id === nt.id);
+                            if (oldTask && oldTask.status === 'open' && nt.status === 'waiting') {
+                                sendNotification("Aufgabe erledigt! ✔️", `Das Kind hat "${nt.title}" fertiggestellt.`);
+                            }
+                        });
+                    }
+                }
+
+                tasks = newTasksList;
+                isFirstLoad = false;
                 renderTasks();
                 updateStatsDisplay();
             });
